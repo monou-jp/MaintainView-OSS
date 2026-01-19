@@ -100,9 +100,6 @@ def generate_csrf_token():
 
 def check_csrf_token():
     import settings
-    if getattr(settings, 'READ_ONLY_MODE', False):
-        from bottle import abort
-        abort(403, "Read-only mode is enabled. Changes are not allowed.")
     
     token = request.forms.decode().get('csrf_token')
     session = get_session()
@@ -118,3 +115,9 @@ def check_csrf_token():
         if getattr(settings, 'IS_CGI', False):
             msg += f" (form: {token[:8] if token else 'None'}..., session: {session.get('csrf_token')[:8] if session.get('csrf_token') else 'None'}...)"
         abort(403, msg)
+
+    # 読み取り専用モードのチェック（CSRFチェックの後に実行）
+    # ログイン画面自体は許可する
+    if getattr(settings, 'READ_ONLY_MODE', False) and request.path != '/login':
+        from bottle import abort
+        abort(403, "Read-only mode is enabled. Changes are not allowed.")
