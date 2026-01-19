@@ -78,6 +78,7 @@ if __name__ == '__main__':
 @app.route('/login', method=['GET', 'POST'])
 @jinja2_view('login.html')
 def login():
+    from auth import check_csrf_token
     user = get_current_user()
     if user:
         if user.role == 'admin': redirect('/admin')
@@ -85,6 +86,18 @@ def login():
 
     error = None
     if request.method == 'POST':
+        # CGI環境でのデバッグ用ログ出力
+        if settings.IS_CGI:
+            print(f"DEBUG: login POST - path: {request.path}, script_name: {request.environ.get('SCRIPT_NAME')}", file=sys.stderr)
+
+        # CSRFチェックの追加
+        try:
+            check_csrf_token()
+        except Exception as e:
+            if settings.IS_CGI:
+                print(f"DEBUG: CSRF failure: {str(e)}", file=sys.stderr)
+            abort(403, str(e))
+
         email = request.forms.decode().get('email')
         password = request.forms.decode().get('password')
         try:
@@ -100,10 +113,14 @@ def login():
         # ただしこの error はリダイレクトせずに render されるので文字化けの問題は起きにくいはず
 
         if user:
+            if settings.IS_CGI:
+                print(f"DEBUG: login success - user: {user.email}", file=sys.stderr)
             set_session({'user_id': user.id})
             if user.role == 'admin': redirect('/admin')
             else: redirect('/client')
     
+    if settings.IS_CGI:
+        print(f"DEBUG: rendering login page - cookie: {request.get_cookie('session')}", file=sys.stderr)
     return {
         'error': error, 
         'csrf_token': generate_csrf_token(), 

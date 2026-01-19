@@ -2,7 +2,7 @@ import os
 import secrets
 
 # 基本設定
-SECRET_KEY = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+SECRET_KEY = os.environ.get('SECRET_KEY', "change_strong_strings")
 DB_PATH = 'maintenance.db'
 DEBUG = True
 
