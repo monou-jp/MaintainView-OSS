@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block title %}ダッシュボード - 管理者{% endblock %}
+{% block content %}
+<h2 class="mb-4">管理者ダッシュボード</h2>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">期限アラート（30日以内）</div>
+            <div class="card-body">
+                {% if alerts %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>サイト名</th>
+                                <th>ドメイン</th>
+                                <th>SSL</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in alerts %}
+                            <tr class="alert-row" data-site-id="{{ alert.site.id }}">
+                                <td><a href="/admin/sites/{{ alert.site.id }}">{{ alert.site.name }}</a></td>
+                                <td>
+                                    <span class="badge bg-{{ alert.domain_alert }}">
+                                        {{ format_date(alert.site.domain_expire_date) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ alert.ssl_alert }}">
+                                        {{ format_date(alert.site.ssl_expire_date) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-muted" onclick="hideAlert({{ alert.site.id }})" title="今回のみ非表示">
+                                        <i class="bi bi-eye-slash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">現在アラートはありません。</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">最近の保守ログ</div>
+            <div class="card-body">
+                {% if recent_logs %}
+                <ul class="list-group list-group-flush">
+                    {% for log in recent_logs %}
+                    <li class="list-group-item">
+                        <small class="text-muted">{{ format_date(log.performed_at) }}</small>
+                        <strong>{{ log.site.name }}</strong>: {{ log.summary }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">ログはありません。</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function hideAlert(siteId) {
+    const row = document.querySelector(`.alert-row[data-site-id="${siteId}"]`);
+    if (row) {
+        row.style.display = 'none';
+        
+        // セッションストレージ等で状態保持しても良いが、
+        // 「今回のみ（リロードまで）」ならDOM操作だけで十分。
+        // リロード後も非表示にするなら localStorage 等を利用。
+    }
+}
+</script>
+{% endblock %}

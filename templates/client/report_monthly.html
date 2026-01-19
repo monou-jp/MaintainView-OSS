@@ -1,0 +1,286 @@
+{% extends "layout.html" %}
+{% block title %}月次レポート - {{ client.display_name }}{% endblock %}
+{% block extra_css %}
+<style>
+    @media print {
+        @page {
+            margin: 10mm;
+        }
+        .no-print, .btn, .breadcrumb, nav, .navbar, footer {
+            display: none !important;
+        }
+        body {
+            padding: 0 !important;
+            margin: 0 !important;
+            background-color: #fff !important;
+        }
+        .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .py-4 {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .mb-4, .mb-5 {
+            margin-bottom: 1.5rem !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .card-body {
+            padding: 0 !important;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+        .report-header {
+            margin-top: 0 !important;
+        }
+    }
+    .report-header {
+        border-bottom: 3px solid #0d6efd;
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        height: 100%;
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="no-print">
+      <ol class="breadcrumb">
+        {% if is_admin_view %}
+        <li class="breadcrumb-item"><a href="/admin/clients">クライアント一覧</a></li>
+        {% else %}
+        <li class="breadcrumb-item"><a href="/client">ダッシュボード</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active">{{ labels.label_monthly_report }}</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <div class="d-flex align-items-center">
+            <a href="{{ request.fullpath }}?month={{ prev_month }}" class="btn btn-outline-secondary btn-sm">&lt; 前月</a>
+            <h4 class="mb-0 mx-3">{{ selected_month[:4] }}年{{ selected_month[5:7] }}月</h4>
+            <a href="{{ request.fullpath }}?month={{ next_month }}" class="btn btn-outline-secondary btn-sm">次月 &gt;</a>
+        </div>
+        <div>
+<!--            <a href="{{ base_path }}/print?month={{ selected_month }}" target="_blank" class="btn btn-primary">-->
+<!--                <i class="bi bi-printer"></i> 印刷用表示 (PDF)-->
+<!--            </a>-->
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body p-5">
+            <!-- 1. 表紙ヘッダ -->
+            <div class="report-header d-flex justify-content-between align-items-end">
+                <div>
+                    <h1 class="h2 mb-1">MaintainView 月次レポート</h1>
+                    <p class="text-muted mb-0">{{ client.display_name }} 様</p>
+                </div>
+                <div class="text-end">
+                    <h2 class="h4 mb-1">{{ selected_month[:4] }}年{{ selected_month[5:7] }}月度</h2>
+                    <p class="small text-muted mb-0">作成日: {{ format_date(today) }}</p>
+                </div>
+            </div>
+
+            <!-- 2. 今月の対応まとめ -->
+            {% if app_settings.show_maintenance_log %}
+            <section class="mb-5">
+                <h3 class="h5 border-start border-4 border-primary ps-2 mb-3">今月の対応まとめ</h3>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="small text-muted">総作業件数</div>
+                            <div class="stat-number">{{ logs|length }}</div>
+                            <div class="small">件</div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card h-100 bg-light border-0">
+                            <div class="card-body">
+                                <h6 class="card-title small text-muted">カテゴリ別内訳</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for cat, count in category_counts.items() %}
+                                    <span class="badge bg-white text-dark border p-2">
+                                        {{ cat }}: <strong>{{ count }}</strong> 件
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted small">今月の作業はありません</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if important_logs %}
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">重要対応事項</div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            {% for log in important_logs %}
+                            <li class="mb-2">
+                                <strong>{{ log.site.name }}</strong>: {{ log.summary }}
+                                {% if log.details %}<br><small class="text-muted">{{ log.details|truncate(100) }}</small>{% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- 3. 今月の作業一覧 -->
+            <section class="mb-5">
+                <h3 class="h5 border-start border-4 border-primary ps-2 mb-3">作業詳細一覧</h3>
+                {% if logs %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 15%">日付</th>
+                                <th style="width: 20%">対象サイト</th>
+                                <th style="width: 15%">カテゴリ</th>
+                                <th>作業概要 / 内容</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ format_date(log.performed_at) }}</td>
+                                <td>{{ log.site.name }}</td>
+                                <td><span class="badge bg-secondary opacity-75">{{ log.category }}</span></td>
+                                <td>
+                                    <strong>{{ log.summary }}</strong>
+                                    {% if log.is_important %}
+                                    <span class="badge bg-danger ms-1">重要</span>
+                                    {% endif %}
+                                    {% if log.details %}
+                                    <div class="small text-muted mt-1" style="white-space: pre-wrap;">{{ log.details }}</div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted small">期間内の作業ログはありません。</p>
+                {% endif %}
+            </section>
+            {% endif %}
+
+            <!-- 4. 次回予定・注意事項 -->
+            {% if app_settings.show_notice %}
+            <section class="mb-5">
+                <h3 class="h5 border-start border-4 border-primary ps-2 mb-3">{{ labels.label_next_plan }}・{{ labels.label_caution }}</h3>
+                {% if notices %}
+                <div class="list-group mb-3">
+                    {% for n in notices %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ n.title }}</h6>
+                            <small class="text-muted">{{ n.site.name }}</small>
+                        </div>
+                        <p class="mb-1 small" style="white-space: pre-wrap;">{{ n.body }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted small">特記事項はありません。</p>
+                {% endif %}
+
+                {% if alerts %}
+                <div class="alert alert-warning py-2 px-3">
+                    <h6 class="alert-heading mb-1"><i class="bi bi-exclamation-triangle"></i> 近日の更新・期限に関する注意</h6>
+                    <ul class="mb-0 small">
+                        {% for a in alerts %}
+                        <li><strong>{{ a.site }}</strong>: {{ a.type }}が近づいています（{{ format_date(a.date) }}）</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
+            <!-- 5. 契約・期限の一覧 -->
+            <section>
+                <h3 class="h5 border-start border-4 border-primary ps-2 mb-3">ご契約・有効期限状況</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-center align-middle small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>サイト名</th>
+                                {% if app_settings.show_contract_info %}<th>{{ labels.label_contract_info }}</th>{% endif %}
+                                {% if app_settings.show_renewal_date %}<th>{{ labels.label_renewal_date }}</th>{% endif %}
+                                {% if app_settings.show_domain_expire %}<th>{{ labels.label_domain_expire }}</th>{% endif %}
+                                {% if app_settings.show_ssl_expire %}<th>{{ labels.label_ssl_expire }}</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for site in sites %}
+                            <tr>
+                                <td class="text-start">{{ site.name }}</td>
+                                {% if app_settings.show_contract_info %}<td>{{ site.contract_type or '-' }}</td>{% endif %}
+                                {% if app_settings.show_renewal_date %}<td>{{ format_date(site.renewal_date) or '-' }}</td>{% endif %}
+                                {% if app_settings.show_domain_expire %}
+                                <td class="{% if get_alert_level(site.domain_expire_date) == 'danger' %}table-danger{% elif get_alert_level(site.domain_expire_date) == 'warning' %}table-warning{% endif %}">
+                                    {{ format_date(site.domain_expire_date) or '-' }}
+                                </td>
+                                {% endif %}
+                                {% if app_settings.show_ssl_expire %}
+                                <td class="{% if get_alert_level(site.ssl_expire_date) == 'danger' %}table-danger{% elif get_alert_level(site.ssl_expire_date) == 'warning' %}table-warning{% endif %}">
+                                    {{ format_date(site.ssl_expire_date) or '-' }}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    {% if not is_print %}
+<!--    <div class="text-center mb-5 no-print">-->
+<!--        <button onclick="window.print()" class="btn btn-secondary px-5">-->
+<!--            <i class="bi bi-printer"></i> この内容を印刷 / PDF保存-->
+<!--        </button>-->
+<!--    </div>-->
+    {% endif %}
+</div>
+{% endblock %}
+
+{% if is_print %}
+{% block extra_js %}
+<!--    <script>-->
+<!--        // 印刷用ページの場合、読み込み完了後に印刷ダイアログを自動で開く-->
+<!--        window.onload = function() {-->
+<!--            // 少し待ってから実行（レイアウト確定のため）-->
+<!--            setTimeout(function() {-->
+<!--                window.print();-->
+<!--            }, 500);-->
+<!--        };-->
+<!--    </script>-->
+{% endblock %}
+{% endif %}

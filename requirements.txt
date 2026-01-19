@@ -1,0 +1,4 @@
+bottle
+peewee
+jinja2
+itsdangerous

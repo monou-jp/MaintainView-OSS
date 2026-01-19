@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}ラベル設定 - 保守ポータル{% endblock %}
+
+{% block content %}
+<div class="card col-md-8 mx-auto">
+    <div class="card-body">
+        <h3 class="card-title mb-4">表示ラベルの上書き設定</h3>
+        <p class="text-muted mb-4">クライアント画面での表示文言をカスタマイズできます。空欄の場合はデフォルト値が使用されます。</p>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold">保守ログ</label>
+                <input type="text" name="label_log" class="form-control" value="{{ labels.label_log }}" placeholder="例：月次メンテナンス報告">
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold">作業報告</label>
+                <input type="text" name="label_report" class="form-control" value="{{ labels.label_report }}" placeholder="例：実施済み作業">
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold">次回予定</label>
+                <input type="text" name="label_next_plan" class="form-control" value="{{ labels.label_next_plan }}" placeholder="例：来月の予定">
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold">注意事項</label>
+                <input type="text" name="label_caution" class="form-control" value="{{ labels.label_caution }}" placeholder="例：運営からのお知らせ">
+            </div>
+            
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-5">保存する</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block title %}サイト詳細 - {{ site.name }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ site.name }} 詳細</h2>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-header">サイト基本情報</div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th style="width: 30%">URL</th>
+                        <td><a href="{{ site.url }}" target="_blank">{{ site.url }}</a></td>
+                    </tr>
+                    {% if app_settings.show_contract_info %}
+                    <tr>
+                        <th>{{ labels.label_contract_info }}</th>
+                        <td>{{ site.contract_type }} ({{ format_date(site.contract_start_date) }} 〜)</td>
+                    </tr>
+                    {% endif %}
+                    {% if app_settings.show_renewal_date %}
+                    <tr>
+                        <th>{{ labels.label_renewal_date }}</th>
+                        <td>{{ format_date(site.renewal_date) }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if app_settings.show_domain_expire %}
+                    <tr>
+                        <th>{{ labels.label_domain_expire }}</th>
+                        <td><span class="badge bg-{{ get_alert_level(site.domain_expire_date) }}">{{ format_date(site.domain_expire_date) }}</span></td>
+                    </tr>
+                    {% endif %}
+                    {% if app_settings.show_ssl_expire %}
+                    <tr>
+                        <th>{{ labels.label_ssl_expire }}</th>
+                        <td><span class="badge bg-{{ get_alert_level(site.ssl_expire_date) }}">{{ format_date(site.ssl_expire_date) }}</span></td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">備考</div>
+            <div class="card-body">
+                <p>{{ site.client_note if site.client_note else "特になし" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        {% if app_settings.show_notice %}
+        <div class="card mb-4">
+            <div class="card-header">{{ labels.label_next_plan }} / {{ labels.label_caution }}</div>
+            <div class="card-body">
+                {% if notices %}
+                {% for notice in notices %}
+                <div class="mb-3 border-bottom pb-2">
+                    <h6 class="text-warning">{{ notice.title }}</h6>
+                    <p class="small mb-0 text-secondary">{{ notice.body | replace('\n', '<br>') | safe }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">特記事項はありません。</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if app_settings.show_files %}
+        <div class="card mb-4">
+            <div class="card-header">{{ labels.label_files }}（最新5件）</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush mb-3">
+                {% for file in files %}
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <div class="text-truncate" style="max-width: 80%;">
+                        <div class="fw-bold">{{ file.title }}</div>
+                        <small class="text-muted">{{ (file.size_bytes/1024)|round(1) }} KB / {{ file.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                    <a href="/files/{{ generate_file_token(file.id) }}" target="_blank" class="btn btn-sm btn-outline-primary">閲覧</a>
+                </li>
+                {% else %}
+                <li class="list-group-item px-0 text-muted">共有されたファイルはありません。</li>
+                {% endfor %}
+                </ul>
+                {% if files %}
+                <div class="text-end">
+                    <a href="/client/sites/{{ site.id }}/files" class="small">全ファイルを見る &raquo;</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if app_settings.show_maintenance_log %}
+        <div class="d-grid">
+            <a href="/client/sites/{{ site.id }}/logs" class="btn btn-outline-info">このサイトの{{ labels.label_log }}を見る</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

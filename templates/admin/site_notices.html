@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}注意事項 - 管理者{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin/sites">サイト一覧</a></li>
+    <li class="breadcrumb-item active">{{ site.name }} 注意事項</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ site.name }} 注意事項・次回予定</h2>
+    <a href="/admin/sites/{{ site.id }}/notices/new" class="btn btn-primary">追加</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>タイトル</th>
+                        <th>期間</th>
+                        <th>公開</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notice in notices %}
+                    <tr>
+                        <td>{{ notice.title }}</td>
+                        <td>
+                            {{ format_date(notice.start_date) }} 〜 {{ format_date(notice.end_date) }}
+                        </td>
+                        <td>
+                            {% if notice.is_visible_to_client %}
+                            <span class="badge bg-success">公開</span>
+                            {% else %}
+                            <span class="badge bg-secondary">非公開</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/admin/notices/{{ notice.id }}/edit" class="btn btn-sm btn-outline-primary">編集</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

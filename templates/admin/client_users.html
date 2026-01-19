@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block title %}ユーザー管理 - 管理者{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin/clients">クライアント一覧</a></li>
+    <li class="breadcrumb-item active">{{ client.display_name }} ユーザー</li>
+  </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">ユーザー一覧</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>メールアドレス</th>
+                            <th>状態</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <form action="/admin/clients/{{ client.id }}/users" method="post" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    <input type="hidden" name="action" value="update_status">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input" type="checkbox" name="is_active" {% if user.is_active %}checked{% endif %} onchange="this.form.submit()">
+                                    </div>
+                                    {{ "有効" if user.is_active else "無効" }}
+                                </form>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#pwModal{{ user.id }}">パスワード変更</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="pwModal{{ user.id }}" tabindex="-1">
+                                  <div class="modal-dialog">
+                                    <form action="/admin/clients/{{ client.id }}/users" method="post" class="modal-content">
+                                      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                      <input type="hidden" name="user_id" value="{{ user.id }}">
+                                      <input type="hidden" name="action" value="change_password">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title">パスワード変更: {{ user.email }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <input type="password" name="new_password" class="form-control" placeholder="新しいパスワード" required>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                                        <button type="submit" class="btn btn-primary">保存</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">新規ユーザー登録</div>
+            <div class="card-body">
+                <form action="/admin/clients/{{ client.id }}/users/new" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="mb-3">
+                        <label class="form-label">メールアドレス</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">パスワード</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">登録</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

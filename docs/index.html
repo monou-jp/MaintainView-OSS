@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaintainView-OSS - 制作会社のためのサイト保守ポータル</title>
+    <meta name="description" content="制作会社がクライアント向けにサイトの保守状況を共有するための軽量ポータルサイト。ドメイン・SSL期限管理、作業ログ、ファイル共有、依頼機能を完備。">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+        }
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            color: #333;
+            line-height: 1.8;
+        }
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 120px 0 160px;
+            text-align: center;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+        .hero h1 {
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        .hero .lead {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+        .section-title {
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: 50px;
+            font-weight: 800;
+            text-align: center;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent-color);
+            transform: translateX(-50%);
+        }
+        .feature-card {
+            border: none;
+            transition: all 0.3s ease;
+            height: 100%;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+        .screenshot-placeholder {
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 350px;
+            color: #adb5bd;
+            font-weight: bold;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .screenshot-placeholder img {
+            max-width: 100%;
+            height: auto;
+            transition: transform 0.5s ease;
+        }
+        .screenshot-placeholder:hover img {
+            transform: scale(1.02);
+        }
+        .step-number {
+            background-color: var(--accent-color);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 80px 0 30px;
+        }
+        .footer a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer a:hover {
+            color: white;
+        }
+        .monou-box {
+            border: none;
+            border-radius: 20px;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(52, 152, 219, 0.02) 100%);
+            box-shadow: inset 0 0 0 1px rgba(52, 152, 219, 0.2);
+        }
+        code {
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #e83e8c;
+        }
+        pre {
+            background-color: #1a1e21;
+            color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        .check-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .check-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+        }
+        .check-list li::before {
+            content: '\F26A';
+            font-family: "bootstrap-icons";
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        .price-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+        .faq-q {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: flex-start;
+        }
+        .faq-q::before {
+            content: 'Q';
+            color: var(--accent-color);
+            margin-right: 15px;
+            font-size: 1.4rem;
+        }
+        .faq-a {
+            margin-top: 15px;
+            padding-left: 30px;
+            color: #555;
+            display: flex;
+            align-items: flex-start;
+        }
+        .faq-a::before {
+            content: 'A';
+            color: var(--secondary-color);
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .btn-xl {
+            padding: 18px 45px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .btn-primary.btn-xl {
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+        .btn-primary.btn-xl:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(52, 152, 219, 0.4);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color: var(--primary-color);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">MaintainView-OSS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#about">概要</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">機能</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#usage">導入方法</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#monou">開発元・支援</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-outline-light ms-lg-3" href="https://github.com/monou-jp/MaintainView-OSS">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="price-badge">オープンソース (AGPL-3.0)</div>
+            <h1 class="display-3">サイト保守の情報を、<br class="d-none d-md-block">もっと透明に、もっと価値あるものに。</h1>
+            <p class="lead">MaintainView-OSSは、制作会社とクライアントをつなぐ、<br class="d-none d-md-block">軽量で高機能な「保守管理ポータル」です。</p>
+            <div class="d-flex justify-content-center gap-3 mt-5">
+                <a href="#usage" class="btn btn-primary btn-xl px-5">今すぐ無料で始める</a>
+                <a href="#features" class="btn btn-outline-light btn-xl px-5 d-none d-sm-block">機能を見る</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Introduction Section -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6">
+                    <h2 class="section-title text-start">制作会社とクライアント、<br>双方のストレスを解消する。</h2>
+                    <p class="lead mb-4">Webサイトの保守業務において、こんな課題はありませんか？</p>
+                    <div class="mb-4">
+                        <div class="d-flex mb-4">
+                            <i class="bi bi-x-circle-fill text-danger fs-4 me-3"></i>
+                            <div>
+                                <h5 class="fw-bold">報告業務のブラックボックス化</h5>
+                                <p class="mb-0 text-muted">「今月何をしたか」をメールやExcelで報告するのが大変。クライアントも内容を把握しきれず、保守費の価値を感じにくい。</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-4">
+                            <i class="bi bi-x-circle-fill text-danger fs-4 me-3"></i>
+                            <div>
+                                <h5 class="fw-bold">期限管理の属人化とリスク</h5>
+                                <p class="mb-0 text-muted">ドメインやSSLの更新期限管理がExcelや担当者のカレンダーに依存。更新忘れによるサイト停止のリスクが常に。 </p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-4">
+                            <i class="bi bi-x-circle-fill text-danger fs-4 me-3"></i>
+                            <div>
+                                <h5 class="fw-bold">バラバラな依頼と対応漏れ</h5>
+                                <p class="mb-0 text-muted">チャット、電話、メールで修正依頼が散乱。対応状況が不透明になり、作業の抜け漏れや言った言わないのトラブルに。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="screenshot-placeholder">
+                        <img src="./asset/img/ss_report_menu.png" alt="ダッシュボード">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value Proposition -->
+            <div class="row mt-5 g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+                        <h4 class="fw-bold mb-3">信頼構築と解約防止</h4>
+                        <p class="text-muted">「何も起きていないから保守費を払う」のではなく、「しっかり管理されているから安心」という価値を可視化。クライアントの満足度を高め、解約リスクを最小化します。</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="bi bi-lightning-fill"></i></div>
+                        <h4 class="fw-bold mb-3">業務工数の大幅削減</h4>
+                        <p class="text-muted">月次レポート作成や期限案内の連絡を効率化。定型作業をシステム化することで、本来注力すべきクリエイティブな業務に集中できる時間を創出します。</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                        <h4 class="fw-bold mb-3">アップセルの機会創出</h4>
+                        <p class="text-muted">サイトの状況や作業ログが一覧できるため、「次のリニューアル」や「追加機能」の提案がしやすくなります。データに基づいた説得力のある提案が可能です。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="section-title">保守業務を加速させる充実の機能</h2>
+                <p class="lead text-muted">現場の「欲しい」を形にした、実用的な機能をワンパッケージで提供。</p>
+            </div>
+            
+            <!-- Feature 1 -->
+            <div class="row g-5 align-items-center mb-5 pb-5">
+                <div class="col-lg-7">
+                    <div class="screenshot-placeholder shadow-lg">
+                        <img src="./asset/img/ss_report.png" alt="保守ログ共有">
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="badge bg-primary mb-2 px-3 py-2">見える化</div>
+                    <h3 class="display-6 fw-bold mb-4">作業内容の「透明化」</h3>
+                    <p class="lead mb-4">日々の細かい修正やアップデート作業をログとして記録。クライアントはいつでも「今月何が行われたか」をリアルタイムに確認できます。</p>
+                    <ul class="check-list">
+                        <li><strong>作業テンプレート機能</strong>：よくある作業を登録して入力工数を削減</li>
+                        <li><strong>非公開ログ</strong>：社内用の備忘録やメモを分けて管理可能</li>
+                        <li><strong>月次レポート</strong>：期間指定でログを集計し、そのまま報告書として提示</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="row g-5 align-items-center mb-5 pb-5 flex-lg-row-reverse">
+                <div class="col-lg-7">
+                    <div class="screenshot-placeholder shadow-lg">
+                        <img src="./asset/img/ss_client.png" alt="期限管理">
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="badge bg-danger mb-2 px-3 py-2">リスク回避</div>
+                    <h3 class="display-6 fw-bold mb-4">期限・契約の一元管理</h3>
+                    <p class="lead mb-4">ドメイン、SSL証明書、サーバー契約などの有効期限をサイトごとに管理。期限が近づくとダッシュボードで強調表示され、更新忘れを徹底的に防ぎます。</p>
+                    <ul class="check-list">
+                        <li><strong>アラート表示</strong>：期限の30日前、14日前、7日前など段階的に警告</li>
+                        <li><strong>契約情報メモ</strong>：サーバーのログイン情報やプラン内容などを安全に記録</li>
+                        <li><strong>期限の自動共有</strong>：クライアント側にも期限を表示し、共同でリスク管理</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="row g-5 align-items-center mb-5">
+                <div class="col-lg-7">
+                    <div class="screenshot-placeholder shadow-lg">
+                        <img src="./asset/img/ss_requests.png" alt="依頼管理">
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="badge bg-warning text-dark mb-2 px-3 py-2">脱・メール迷子</div>
+                    <h3 class="display-6 fw-bold mb-4">依頼管理システム</h3>
+                    <p class="lead mb-4">修正依頼や質問を一元管理。各案件に「未対応」「進行中」「完了」などのステータスを持たせることで、チーム内での共有もスムーズになります。</p>
+                    <ul class="check-list">
+                        <li><strong>ワンクリック変換</strong>：依頼からそのまま「作業ログ」へ変換・登録</li>
+                        <li><strong>ファイル添付</strong>：スクリーンショットや指示書などの資料を安全に共有</li>
+                        <li><strong>履歴の永久保存</strong>：過去のやり取りをすべて保存し、「言った言わない」を防止</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Other Features Mini Grid -->
+            <div class="row g-4 mt-5">
+                <div class="col-md-3">
+                    <div class="feature-card p-4">
+                        <i class="bi bi-megaphone fs-3 text-primary mb-3"></i>
+                        <h5 class="fw-bold">お知らせ機能</h5>
+                        <p class="small text-muted mb-0">年末年始休暇やメンテナンス情報などを全クライアントに一斉周知。</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card p-4">
+                        <i class="bi bi-file-earmark-pdf fs-3 text-primary mb-3"></i>
+                        <h5 class="fw-bold">PDFレポート出力</h5>
+                        <p class="small text-muted mb-0">月次報告を美しいPDFレイアウトで出力。印刷しての提出にも対応。</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card p-4">
+                        <i class="bi bi-tags fs-3 text-primary mb-3"></i>
+                        <h5 class="fw-bold">ラベル変更機能</h5>
+                        <p class="small text-muted mb-0">「サイト」を「案件」に、「クライアント」を「顧客」になど呼称をカスタマイズ。</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card p-4">
+                        <i class="bi bi-hdd-network fs-3 text-primary mb-3"></i>
+                        <h5 class="fw-bold">CGI環境対応</h5>
+                        <p class="small text-muted mb-0">共有レンタルサーバーのCGI環境でも動作可能。特別なサーバーは不要。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-5">
+        <div class="container py-5">
+            <h2 class="section-title">よくある質問</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="faq-item">
+                        <div class="faq-q">導入に費用はかかりますか？</div>
+                        <div class="faq-a">MaintainView-OSSはオープンソース（AGPL-3.0）として公開されており、本体の利用は完全に無料です。自社のサーバーに設置して自由に運用いただけます。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">セキュリティは大丈夫ですか？</div>
+                        <div class="faq-a">各クライアントはログイン権限に基づいて、自分に関係するサイト情報のみにアクセス可能です。また、オープンソースであるため、ソースコードを精査し自社の基準に合わせることも可能です。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">どのようなサーバーで動きますか？</div>
+                        <div class="faq-a">Python 3.7以降が動作する環境であれば動作します。また、日本の多くのレンタルサーバー（エックスサーバー、さくらのレンタルサーバ等）のCGI環境での動作も確認・サポートしています。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q">自社専用にカスタマイズしたいのですが。</div>
+                        <div class="faq-a">オープンソースですので、ご自身でコードを改変してカスタマイズいただけます。また、開発元の「門王」では、有償でのカスタマイズや導入支援も承っております。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage Section -->
+    <section id="usage" class="py-5 bg-light">
+        <div class="container py-5">
+            <h2 class="section-title">導入・運用ステップ</h2>
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <div class="mb-5">
+                        <h4 class="h5 fw-bold mb-3"><span class="step-number">1</span> サーバーへ設置</h4>
+                        <p class="text-muted">依存ライブラリをインストールし、ファイルをアップロードします。多くの日本のレンタルサーバーで動作するCGIモードも標準サポートしています。</p>
+                        <pre><code># 依存パッケージのインストール
+pip install -r requirements.txt
+
+# settings.py で SECRET_KEY などを設定</code></pre>
+                        <div class="alert alert-warning py-3 px-3 small mt-3 border-0 shadow-sm">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>CGI環境（共有サーバー等）の場合：</strong> <code>settings.py</code> の <code>IS_CGI = True</code> に設定するだけで、面倒なサーバー構成なしに即座に動作します。
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <h4 class="h5 fw-bold mb-3"><span class="step-number">2</span> 自社仕様にカスタマイズ</h4>
+                        <p class="text-muted">管理画面から、自社のブランドや運用ルールに合わせた調整を行います。専門知識は不要です。</p>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="bg-white p-3 rounded shadow-sm h-100">
+                                    <h6 class="fw-bold mb-2 small"><i class="bi bi-tag-fill text-primary me-2"></i>用語のカスタマイズ</h6>
+                                    <p class="small text-muted mb-0">「クライアント」を「顧客」に、「サイト」を「プロジェクト」に変更するなど、社内の用語と統一可能。</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="bg-white p-3 rounded shadow-sm h-100">
+                                    <h6 class="fw-bold mb-2 small"><i class="bi bi-toggle-on text-primary me-2"></i>機能のON/OFF</h6>
+                                    <p class="small text-muted mb-0">「ファイル共有は使わない」など、必要な機能だけに絞ってシンプルに運用できます。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <h4 class="h5 fw-bold mb-3"><span class="step-number">3</span> 運用開始：信頼を積み上げる</h4>
+                        <p class="text-muted">クライアントとサイト情報を登録すれば、その日からポータルとして機能します。既存の管理表から少しずつ移行しましょう。</p>
+                        <div class="bg-primary text-white p-4 rounded-4 shadow mt-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-graph-up me-2"></i>継続的な価値提供へ</h5>
+                            <p class="mb-0">作業のたびに1分だけ時間をとってログを残す。それだけで、クライアントには「しっかりと守られている」という安心感が積み重なり、長期的なパートナーシップへと繋がります。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="sticky-top" style="top: 100px; z-index: 1;">
+                        <div class="card bg-white border-0 shadow-sm p-4 mb-4 rounded-4">
+                            <h5 class="fw-bold mb-4 border-bottom pb-2">動作要件</h5>
+                            <ul class="check-list small mb-0">
+                                <li><strong>Python 3.7+</strong> (3.11+推奨)</li>
+                                <li><strong>Bottle</strong> (軽量WSGIフレームワーク)</li>
+                                <li><strong>Peewee</strong> (ORM / SQLite3)</li>
+                                <li><strong>Jinja2</strong> (テンプレートエンジン)</li>
+                                <li><strong>SQLite3</strong> (データベース)</li>
+                            </ul>
+                        </div>
+                        <div class="card bg-dark text-white border-0 shadow-lg p-4 rounded-4">
+                            <h5 class="fw-bold mb-3 text-primary">OSSならではの自由</h5>
+                            <p class="small mb-4 opacity-75">自社サーバーで運用するため、月額利用料は一切かかりません。データもすべて自社で管理でき、プライバシー面でも安心です。</p>
+                            <a href="https://github.com/monou-jp/MaintainView-OSS/archive/refs/heads/main.zip" class="btn btn-outline-light w-100 fw-bold">
+                                <i class="bi bi-download me-2"></i> ZIPでダウンロード
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Monou Section (Developer Info) -->
+    <section id="monou" class="py-5 bg-white">
+        <div class="container py-5">
+            <div class="monou-box">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="badge bg-primary mb-3">Developer</div>
+                        <h2 class="display-5 fw-bold mb-3">開発元：門王 (MONOU)</h2>
+                        <p class="lead mb-4">MaintainView-OSSは、Web制作・システム開発を手掛ける「門王」によって開発・メンテナンスされています。日々、制作現場で直面する「報告の工数」や「期限管理のリスク」を自ら解決するために生まれました。</p>
+                        <p>オープンソースとしての公開を通じて、Web制作業界全体の業務効率化と、クライアントとのより良い関係構築に貢献することを目指しています。</p>
+                        <div class="mt-5">
+                            <a href="https://monou.jp" class="btn btn-primary btn-lg px-4 py-3 me-3" target="_blank">
+                                <i class="bi bi-house-door-fill me-2"></i> 門王 公式サイト
+                            </a>
+                            <a href="https://monou.jp/contact" class="btn btn-outline-primary btn-lg px-4 py-3" target="_blank">
+                                <i class="bi bi-envelope-fill me-2"></i> お問い合わせ
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-5 mt-md-0">
+                        <div class="card border-0 shadow-sm p-4 h-100">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill me-2 text-primary"></i>カスタマイズ・導入支援</h5>
+                            <p class="small text-muted mb-4">自社ブランドに合わせたデザイン変更、既存システム（顧客管理など）との連携、サーバーへの設置代行、独自機能の追加開発など、制作会社様向けの個別支援を承っております。</p>
+                            <p class="fw-bold text-primary mb-0">「自社専用の保守ポータル」として進化させたい方は、お気軽に門王までご相談ください。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-5 bg-primary text-white text-center">
+        <div class="container py-4">
+            <h2 class="display-6 fw-bold mb-4">保守業務を、もっとシンプルに。</h2>
+            <p class="lead mb-5 opacity-75">今すぐMaintainView-OSSを導入して、<br class="d-block d-sm-none">業務効率化と信頼獲得を両立させましょう。</p>
+            <a href="https://github.com/monou-jp/MaintainView-OSS" class="btn btn-light btn-xl px-5">
+                <i class="bi bi-github me-2"></i> GitHubでソースコードを見る
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h5 class="mb-3 text-white">MaintainView-OSS</h5>
+                    <p class="small text-white">
+                        制作会社とクライアントの良好な関係を支える、シンプルで強力な保守ポータル。
+                    </p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-3 text-white">リンク</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://github.com/monou-jp/MaintainView-OSS">GitHub リポジトリ</a></li>
+                        <li><a href="https://monou.jp">門王 公式サイト</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-3 text-white">ライセンス</h5>
+                    <p class="small text-white">
+                        GNU Affero General Public License v3.0 (AGPL-3.0)
+                    </p>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4 border-secondary">
+            <div class="text-center small text-white">
+                &copy; 2026 <a href="https://monou.jp" class="text-white">門王 (MONOU)</a>. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block title %}ホーム - {{ client.display_name }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">こんにちは、{{ client.display_name }} 様</h2>
+
+{% if app_settings.show_top_cards %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        {% if app_settings.show_maintenance_log %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">{{ labels.label_log }}（今月）</div>
+            <div class="card-body">
+                {% if logs %}
+                <h6 class="mb-3 text-secondary">{{ labels.label_report }}</h6>
+                <div class="list-group list-group-flush">
+                    {% for log in logs %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ log.summary }}</h5>
+                            <small>{{ format_date(log.performed_at) }}</small>
+                        </div>
+                        <p class="mb-1 text-muted">{{ log.site.name }} ({{ log.category }})</p>
+                        {% if log.details %}
+                        <small class="text-secondary">{{ log.details | replace('\n', '<br>') | safe }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">今月の対応はまだありません。</p>
+                {% endif %}
+                <div class="mt-3 d-flex justify-content-between">
+                    <div>
+                    {% if app_settings.show_monthly_report %}
+                    <a href="/client/reports/monthly" class="btn btn-primary">
+                        <i class="bi bi-file-earmark-bar-graph"></i> {{ labels.label_monthly_report }}を見る
+                    </a>
+                    {% endif %}
+                    </div>
+                    <a href="/client/logs" class="btn btn-outline-primary">全ての履歴を見る</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if app_settings.show_notice %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">{{ labels.label_next_plan }} / {{ labels.label_caution }}</div>
+            <div class="card-body">
+                {% if notices %}
+                {% for notice in notices %}
+                <div class="mb-3 border-bottom pb-2">
+                    <h6>{{ notice.title }} <small class="text-muted">({{ notice.site.name }})</small></h6>
+                    <p class="small mb-0">{{ notice.body | replace('\n', '<br>') | safe }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">現在、特記事項はありません。</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        {% if app_settings.show_domain_expire or app_settings.show_ssl_expire %}
+        <div class="card border-danger mb-4">
+            <div class="card-header bg-danger text-white">期限アラート</div>
+            <div class="card-body p-0">
+                {% if alerts %}
+                <table class="table mb-0">
+                    <thead>
+                        <tr class="small">
+                            <th>サイト</th>
+                            <th>期限項目</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts %}
+                        <tr>
+                            <td><small>{{ alert.site.name }}</small></td>
+                            <td>
+                                {% if app_settings.show_domain_expire and alert.domain_alert != 'success' %}
+                                <span class="badge bg-{{ alert.domain_alert }} w-100 mb-1">{{ labels.label_domain_expire }}: {{ format_date(alert.site.domain_expire_date) }}</span>
+                                {% endif %}
+                                {% if app_settings.show_ssl_expire and alert.ssl_alert != 'success' %}
+                                <span class="badge bg-{{ alert.ssl_alert }} w-100">{{ labels.label_ssl_expire }}: {{ format_date(alert.site.ssl_expire_date) }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-3 text-muted">異常ありません。</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header bg-light">事務連絡メモ</div>
+            <div class="card-body">
+                <p class="small text-secondary">{{ client.client_memo if client.client_memo else "特になし" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

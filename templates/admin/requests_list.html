@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}依頼受信箱 - 管理者画面{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">依頼受信箱</h1>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form action="/admin/requests" method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label small text-muted">状態</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">すべて</option>
+                    <option value="new" {% if selected_status == 'new' %}selected{% endif %}>{{ labels.status_new }}</option>
+                    <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>{{ labels.status_in_progress }}</option>
+                    <option value="done" {% if selected_status == 'done' %}selected{% endif %}>{{ labels.status_done }}</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">クライアント</label>
+                <select name="client_id" class="form-select form-select-sm">
+                    <option value="">すべて</option>
+                    {% for client in clients %}
+                    <option value="{{ client.id }}" {% if selected_client_id == client.id|string %}selected{% endif %}>{{ client.display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small text-muted">検索</label>
+                <input type="text" name="q" class="form-select form-select-sm" value="{{ q }}" placeholder="件名・内容">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-sm btn-secondary w-100">検索</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle bg-white">
+        <thead class="table-light">
+            <tr>
+                <th>状態</th>
+                <th>緊急度</th>
+                <th>クライアント</th>
+                <th>対象サイト</th>
+                <th>件名</th>
+                <th>最終更新</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>
+                    <span class="badge {% if req.status == 'new' %}bg-danger{% elif req.status == 'in_progress' %}bg-primary{% else %}bg-secondary{% endif %}">
+                        {% if req.status == 'new' %}{{ labels.status_new }}{% elif req.status == 'in_progress' %}{{ labels.status_in_progress }}{% else %}{{ labels.status_done }}{% endif %}
+                    </span>
+                </td>
+                <td>
+                    {% if req.priority == 'high' %}
+                    <span class="badge bg-warning text-dark">急ぎ</span>
+                    {% else %}
+                    <span class="text-muted small">通常</span>
+                    {% endif %}
+                </td>
+                <td>{{ req.client.display_name }}</td>
+                <td>{{ req.site.name if req.site else '全体' }}</td>
+                <td>
+                    <a href="/admin/requests/{{ req.id }}" class="text-decoration-none fw-bold">
+                        {{ req.subject }}
+                    </a>
+                </td>
+                <td><small>{{ format_date(req.updated_at) }}</small></td>
+                <td>
+                    <a href="/admin/requests/{{ req.id }}" class="btn btn-sm btn-outline-primary">詳細</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center py-4 text-muted">依頼は見つかりませんでした。</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

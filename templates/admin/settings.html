@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+
+{% block title %}システム設定 - 保守ポータル{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <h3 class="mb-4">システム設定</h3>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="card mb-4">
+                <div class="card-header fw-bold">表示項目のON/OFF (クライアント画面)</div>
+                <div class="card-body">
+                    <p class="text-muted mb-4 small">チェックを外すと、クライアント画面から該当機能・項目が非表示になり、アクセスも制限されます。管理者は引き続き利用可能です。</p>
+                    
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_contract_info" id="show_contract_info" {% if app_settings.show_contract_info %}checked{% endif %}>
+                                <label class="form-check-label" for="show_contract_info">契約情報（契約種別・期間）</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_renewal_date" id="show_renewal_date" {% if app_settings.show_renewal_date %}checked{% endif %}>
+                                <label class="form-check-label" for="show_renewal_date">更新予定日</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_domain_expire" id="show_domain_expire" {% if app_settings.show_domain_expire %}checked{% endif %}>
+                                <label class="form-check-label" for="show_domain_expire">ドメイン期限</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_ssl_expire" id="show_ssl_expire" {% if app_settings.show_ssl_expire %}checked{% endif %}>
+                                <label class="form-check-label" for="show_ssl_expire">安全証明書(SSL)期限</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_notice" id="show_notice" {% if app_settings.show_notice %}checked{% endif %}>
+                                <label class="form-check-label" for="show_notice">次回予定・注意事項</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_maintenance_log" id="show_maintenance_log" {% if app_settings.show_maintenance_log %}checked{% endif %}>
+                                <label class="form-check-label" for="show_maintenance_log">保守ログ</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_monthly_report" id="show_monthly_report" {% if app_settings.show_monthly_report %}checked{% endif %}>
+                                <label class="form-check-label" for="show_monthly_report">月次レポート</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_requests" id="show_requests" {% if app_settings.show_requests %}checked{% endif %}>
+                                <label class="form-check-label" for="show_requests">依頼（メッセージ）機能</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_files" id="show_files" {% if app_settings.show_files %}checked{% endif %}>
+                                <label class="form-check-label" for="show_files">資料・ファイル共有</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_top_cards" id="show_top_cards" {% if app_settings.show_top_cards %}checked{% endif %}>
+                                <label class="form-check-label" for="show_top_cards">トップ画面のカード表示</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header fw-bold">表示文言（ラベル）の上書き</div>
+                <div class="card-body">
+                    <p class="text-muted mb-4 small">表示名を変更したい場合に記入してください。空欄の場合はデフォルト値が使用されます。</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small">「保守ログ」の呼称</label>
+                            <input type="text" name="label_log" class="form-control" value="{{ display_labels.label_log }}" placeholder="{{ default_labels.label_log }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「作業報告」の呼称</label>
+                            <input type="text" name="label_report" class="form-control" value="{{ display_labels.label_report }}" placeholder="{{ default_labels.label_report }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「次回予定」の呼称</label>
+                            <input type="text" name="label_next_plan" class="form-control" value="{{ display_labels.label_next_plan }}" placeholder="{{ default_labels.label_next_plan }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「注意事項」の呼称</label>
+                            <input type="text" name="label_caution" class="form-control" value="{{ display_labels.label_caution }}" placeholder="{{ default_labels.label_caution }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「契約情報」の呼称</label>
+                            <input type="text" name="label_contract_info" class="form-control" value="{{ display_labels.label_contract_info }}" placeholder="{{ default_labels.label_contract_info }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「更新予定日」の呼称</label>
+                            <input type="text" name="label_renewal_date" class="form-control" value="{{ display_labels.label_renewal_date }}" placeholder="{{ default_labels.label_renewal_date }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「ドメイン期限」の呼称</label>
+                            <input type="text" name="label_domain_expire" class="form-control" value="{{ display_labels.label_domain_expire }}" placeholder="{{ default_labels.label_domain_expire }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「SSL期限」の呼称</label>
+                            <input type="text" name="label_ssl_expire" class="form-control" value="{{ display_labels.label_ssl_expire }}" placeholder="{{ default_labels.label_ssl_expire }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「月次レポート」の呼称</label>
+                            <input type="text" name="label_monthly_report" class="form-control" value="{{ display_labels.label_monthly_report }}" placeholder="{{ default_labels.label_monthly_report }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「依頼」の呼称</label>
+                            <input type="text" name="label_request" class="form-control" value="{{ display_labels.label_request }}" placeholder="{{ default_labels.label_request }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">「資料・ファイル」の呼称</label>
+                            <input type="text" name="label_files" class="form-control" value="{{ display_labels.label_files }}" placeholder="{{ default_labels.label_files }}">
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 border-bottom pb-2">依頼ステータス</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">新規（受付済み）</label>
+                            <input type="text" name="status_new" class="form-control" value="{{ display_labels.status_new }}" placeholder="{{ default_labels.status_new }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">対応中</label>
+                            <input type="text" name="status_in_progress" class="form-control" value="{{ display_labels.status_in_progress }}" placeholder="{{ default_labels.status_in_progress }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">完了</label>
+                            <input type="text" name="status_done" class="form-control" value="{{ display_labels.status_done }}" placeholder="{{ default_labels.status_done }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end mb-5">
+                <button type="submit" class="btn btn-primary px-5 btn-lg">設定を保存する</button>
+            </div>
+        </form>
+
+        <div class="card border-danger mb-5">
+            <div class="card-header bg-danger text-white fw-bold">管理者パスワード変更</div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="change_password">
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label small">新しいパスワード</label>
+                            <input type="password" name="new_password" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-danger w-100">パスワードを変更する</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

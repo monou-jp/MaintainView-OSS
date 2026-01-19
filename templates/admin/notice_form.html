@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}注意事項編集 - 管理者{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin/sites/{{ site.id }}/notices">注意事項一覧</a></li>
+    <li class="breadcrumb-item active">{% if notice %}編集{% else %}新規{% endif %}</li>
+  </ol>
+</nav>
+
+<div class="card p-4">
+    <form action="{% if notice %}/admin/notices/{{ notice.id }}/edit{% else %}/admin/sites/{{ site.id }}/notices/new{% endif %}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="mb-3">
+            <label class="form-label">タイトル (クライアント表示用)</label>
+            <input type="text" name="title" class="form-control" value="{{ notice.title if notice else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">内容 (クライアント表示用)</label>
+            <textarea name="body" class="form-control" rows="5" required>{{ notice.body if notice else '' }}</textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">表示開始日 (任意)</label>
+                <input type="date" name="start_date" class="form-control" value="{{ format_date(notice.start_date) if notice else '' }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">表示終了日 (任意)</label>
+                <input type="date" name="end_date" class="form-control" value="{{ format_date(notice.end_date) if notice else '' }}">
+            </div>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_visible_to_client" class="form-check-input" id="isVisible" {% if not notice or notice.is_visible_to_client %}checked{% endif %}>
+            <label class="form-check-label" for="isVisible">クライアントに公開</label>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </form>
+</div>
+{% endblock %}

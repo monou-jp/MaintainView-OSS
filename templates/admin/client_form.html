@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}{% if client %}クライアント編集{% else %}新規クライアント{% endif %} - 管理者{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin/clients">クライアント一覧</a></li>
+    <li class="breadcrumb-item active">{% if client %}編集{% else %}新規{% endif %}</li>
+  </ol>
+</nav>
+
+<div class="card p-4">
+    <form action="{% if client %}/admin/clients/{{ client.id }}{% else %}/admin/clients/new{% endif %}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">正式名称</label>
+                <input type="text" name="name" class="form-control" value="{{ client.name if client else '' }}" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">表示名 (クライアント画面用)</label>
+                <input type="text" name="display_name" class="form-control" value="{{ client.display_name if client else '' }}" required>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">クライアント向けメモ</label>
+            <textarea name="client_memo" class="form-control" rows="3">{{ client.client_memo if client else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">内部用メモ</label>
+            <textarea name="internal_memo" class="form-control" rows="3">{{ client.internal_memo if client else '' }}</textarea>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if not client or client.is_active %}checked{% endif %}>
+            <label class="form-check-label" for="isActive">有効</label>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </form>
+</div>
+{% endblock %}

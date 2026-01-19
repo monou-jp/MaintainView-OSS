@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block title %}サイト編集 - 管理者{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin/sites">サイト一覧</a></li>
+    <li class="breadcrumb-item active">{% if site %}編集{% else %}新規{% endif %}</li>
+  </ol>
+</nav>
+
+<div class="card p-4">
+    <form action="{% if site %}/admin/sites/{{ site.id }}{% else %}/admin/sites/new{% endif %}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">クライアント</label>
+                <select name="client_id" class="form-select" required>
+                    {% for client in clients %}
+                    <option value="{{ client.id }}" {% if site and site.client.id == client.id %}selected{% endif %}>{{ client.display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">サイト名</label>
+                <input type="text" name="name" class="form-control" value="{{ site.name if site else '' }}" required>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">URL</label>
+            <input type="url" name="url" class="form-control" value="{{ site.url if site else '' }}">
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">契約種別</label>
+                <input type="text" name="contract_type" class="form-control" value="{{ site.contract_type if site else '' }}" placeholder="例: 月次保守">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">契約開始日</label>
+                <input type="date" name="contract_start_date" class="form-control" value="{{ format_date(site.contract_start_date) if site else '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">契約終了日</label>
+                <input type="date" name="contract_end_date" class="form-control" value="{{ format_date(site.contract_end_date) if site else '' }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">次回更新日</label>
+                <input type="date" name="renewal_date" class="form-control" value="{{ format_date(site.renewal_date) if site else '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">ドメイン期限</label>
+                <input type="date" name="domain_expire_date" class="form-control" value="{{ format_date(site.domain_expire_date) if site else '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">SSL期限</label>
+                <input type="date" name="ssl_expire_date" class="form-control" value="{{ format_date(site.ssl_expire_date) if site else '' }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">クライアント向けノート</label>
+            <textarea name="client_note" class="form-control" rows="3">{{ site.client_note if site else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">内部用ノート</label>
+            <textarea name="internal_note" class="form-control" rows="3">{{ site.internal_note if site else '' }}</textarea>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if not site or site.is_active %}checked{% endif %}>
+            <label class="form-check-label" for="isActive">有効</label>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </form>
+</div>
+{% endblock %}

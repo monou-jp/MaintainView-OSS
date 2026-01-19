@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}新規依頼 - 保守ポータル{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">新規依頼・相談</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="/client/requests/new" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="mb-3">
+                <label for="site_id" class="form-label">対象サイト <span class="badge bg-danger">必須</span></label>
+                <select name="site_id" id="site_id" class="form-select" required>
+                    <option value="all">全体 / 不明</option>
+                    {% for site in sites %}
+                    <option value="{{ site.id }}">{{ site.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="subject" class="form-label">件名 <span class="badge bg-danger">必須</span></label>
+                <input type="text" class="form-control" id="subject" name="subject" required placeholder="例：テキストの修正依頼">
+            </div>
+
+            <div class="mb-3">
+                <label for="file" class="form-label">ファイルを添付 (任意)</label>
+                <input type="file" name="file" id="file" class="form-control">
+            </div>
+            
+            <div class="mb-3">
+                <label for="priority" class="form-label">緊急度</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="priority" id="p_normal" value="normal" checked>
+                        <label class="form-check-label" for="p_normal">通常</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="priority" id="p_high" value="high">
+                        <label class="form-check-label" for="p_high"><span class="text-danger fw-bold">急ぎ</span></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="body" class="form-label">内容 <span class="badge bg-danger">必須</span></label>
+                <textarea class="form-control" id="body" name="body" rows="8" required placeholder="依頼内容を具体的に記入してください。"></textarea>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary px-4">送信する</button>
+                <a href="/client/requests" class="btn btn-outline-secondary ms-2">キャンセル</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ 'テンプレート編集' if template else 'テンプレート新規作成' }} - 保守ポータル{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/log_templates">ログテンプレート管理</a></li>
+        <li class="breadcrumb-item active">{{ '編集' if template else '新規作成' }}</li>
+    </ol>
+</nav>
+
+<div class="card col-md-8 mx-auto">
+    <div class="card-body">
+        <h3 class="card-title mb-4">{{ 'テンプレート編集' if template else 'テンプレート新規作成' }}</h3>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="mb-3">
+                <label class="form-label">テンプレート名</label>
+                <input type="text" name="name" class="form-control" value="{{ template.name if template else '' }}" required placeholder="例：定期点検">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">カテゴリー</label>
+                <input type="text" name="category" class="form-control" value="{{ template.category if template else '' }}" required placeholder="例：保守">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">サマリー (クライアント向け短文)</label>
+                <input type="text" name="summary" class="form-control" value="{{ template.summary if template else '' }}" required placeholder="例：システム定期点検を実施しました">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">詳細内容 (任意)</label>
+                <textarea name="details" class="form-control" rows="5">{{ template.details if template else '' }}</textarea>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if not template or template.is_active %}checked{% endif %}>
+                <label class="form-check-label" for="is_active">有効にする</label>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="/admin/log_templates" class="btn btn-outline-secondary">戻る</a>
+                <button type="submit" class="btn btn-primary px-4">保存する</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

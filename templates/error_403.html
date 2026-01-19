@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}アクセス禁止 (403) - 保守ポータル{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-octagon-fill me-2"></i>アクセスが拒否されました (403 Forbidden)</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">この操作を実行する権限がないか、システムの状態により制限されています。</p>
+                    
+                    <hr>
+                    
+                    <h5>確認事項</h5>
+                    <ul class="list-group list-group-flush mb-4">
+                        {% if read_only_mode %}
+                        <li class="list-group-item list-group-item-warning">
+                            <strong><i class="bi bi-info-circle-fill me-2"></i>読み取り専用（デモモード）:</strong><br>
+                            現在、システムは読み取り専用モードで動作しています。データの登録、更新、削除は行えません。
+                            システム詳細についてはこちらをご確認ください：<a href="https://monou.jp" target="_blank">https://monou.jp</a>
+                        </li>
+                        {% endif %}
+                        <li class="list-group-item">
+                            <strong>ログイン状態:</strong><br>
+                            セッションが切れている可能性があります。一度ログアウトして再度ログインを試してください。
+                        </li>
+                        <li class="list-group-item">
+                            <strong>実行権限:</strong><br>
+                            管理者権限が必要な操作を一般ユーザーで行おうとしていないか確認してください。
+                        </li>
+                        <li class="list-group-item">
+                            <strong>CSRFトークンエラー:</strong><br>
+                            ブラウザの「戻る」ボタンを使用したり、長時間放置した後に送信した場合に発生することがあります。ページを再読み込みして再度お試しください。
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="/" class="btn btn-primary">ダッシュボードへ戻る</a>
+                        <a href="/logout" class="btn btn-outline-secondary ms-2">ログアウト</a>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    詳細なメッセージ: {{ error_message }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content_noauth %}
+{# ログインしていない場合でも同じエラー表示を使用 #}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-1 text-danger">403</h1>
+            <h2>アクセス禁止</h2>
+            <p>{{ error_message }}</p>
+            {% if read_only_mode %}
+            <div class="alert alert-warning">
+                現在、システムは読み取り専用モード（デモモード）です。
+            </div>
+            {% endif %}
+            <a href="/login" class="btn btn-primary">ログイン画面へ</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

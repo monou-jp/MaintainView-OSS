@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block title %}ファイル一覧 - {{ site.name }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/client/sites">サイト一覧</a></li>
+    <li class="breadcrumb-item"><a href="/client/sites/{{ site.id }}">{{ site.name }}</a></li>
+    <li class="breadcrumb-item active">ファイル一覧</li>
+  </ol>
+</nav>
+
+<h2 class="mb-4">{{ site.name }} 共有ファイル</h2>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ファイル名</th>
+                    <th>カテゴリ</th>
+                    <th>サイズ</th>
+                    <th>登録日</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ file.title }}</div>
+                        {% if file.description %}
+                        <div class="small text-secondary">{{ file.description }}</div>
+                        {% endif %}
+                    </td>
+                    <td>{{ file.category or '-' }}</td>
+                    <td>{{ (file.size_bytes / 1024) | round(1) }} KB</td>
+                    <td>{{ file.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <a href="/files/{{ generate_file_token(file.id) }}" target="_blank" class="btn btn-sm btn-primary">閲覧・ダウンロード</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">共有されたファイルはありません。</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

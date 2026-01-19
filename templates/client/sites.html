@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}サイト一覧 - {{ current_user.client.display_name }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">管理サイト一覧</h2>
+
+<div class="row">
+    {% for site in sites %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ site.name }}</h5>
+                <p class="card-text small text-muted"><i class="bi bi-link-45deg"></i> {{ site.url }}</p>
+                <div class="mb-3">
+                    {% if app_settings.show_domain_expire %}
+                    <span class="badge bg-{{ get_alert_level(site.domain_expire_date) }} me-1">{{ labels.label_domain_expire }}: {{ format_date(site.domain_expire_date) }}</span>
+                    {% endif %}
+                    {% if app_settings.show_ssl_expire %}
+                    <span class="badge bg-{{ get_alert_level(site.ssl_expire_date) }}">{{ labels.label_ssl_expire }}: {{ format_date(site.ssl_expire_date) }}</span>
+                    {% endif %}
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="/client/sites/{{ site.id }}" class="btn btn-primary">詳細を見る</a>
+                    {% if app_settings.show_maintenance_log %}
+                    <a href="/client/sites/{{ site.id }}/logs" class="btn btn-outline-info">履歴</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

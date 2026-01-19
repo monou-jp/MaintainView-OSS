@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ request.subject }} - 保守ポータル{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/client/requests">{{ labels.label_request }}一覧</a></li>
+    <li class="breadcrumb-item active" aria-current="page">依頼詳細</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ request.subject }}</h1>
+    <div>
+        <span class="badge {% if request.status == 'new' %}bg-danger{% elif request.status == 'in_progress' %}bg-primary{% else %}bg-secondary{% endif %} fs-6">
+            {% if request.status == 'new' %}{{ labels.status_new }}{% elif request.status == 'in_progress' %}{{ labels.status_in_progress }}{% else %}{{ labels.status_done }}{% endif %}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>ご依頼内容</strong>
+                    <small class="text-muted">{{ format_date(request.created_at) }}</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="mb-0" style="white-space: pre-wrap;">{{ request.body }}</p>
+                {% if initial_files %}
+                <div class="mt-3 p-2 bg-light border rounded">
+                    <small class="text-muted d-block mb-1">添付ファイル:</small>
+                    {% for f in initial_files %}
+                        <a href="/files/{{ generate_file_token(f.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary mb-1">
+                            <i class="bi bi-file-earmark"></i> {{ f.title }}
+                        </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <hr>
+                <small class="text-muted">
+                    対象: {{ request.site.name if request.site else '全体' }} | 
+                    緊急度: {{ '急ぎ' if request.priority == 'high' else '通常' }}
+                </small>
+            </div>
+        </div>
+
+        <h5 class="mb-3">やりとり</h5>
+        {% for msg in request.messages.order_by(RequestMessage.created_at) %}
+        <div class="card mb-3 {% if msg.author_role == 'admin' %}bg-light ms-5{% else %}me-5{% endif %}">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between mb-1">
+                    <small class="fw-bold">
+                        {% if msg.author_role == 'admin' %}制作会社{% else %}お客様{% endif %}
+                    </small>
+                    <small class="text-muted">{{ format_date(msg.created_at) }}</small>
+                </div>
+                <p class="mb-0" style="white-space: pre-wrap;">{{ msg.body }}</p>
+                {% if msg.shared_file %}
+                <div class="mt-2">
+                    <a href="/files/{{ generate_file_token(msg.shared_file.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-file-earmark"></i> {{ msg.shared_file.title }}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <form action="/client/requests/{{ request.id }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="mb-3">
+                        <label for="body" class="form-label fw-bold">追記・返信</label>
+                        <textarea class="form-control" id="body" name="body" rows="3" required placeholder="メッセージを入力してください。"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label small">ファイルを添付 (任意)</label>
+                        <input type="file" name="file" id="file" class="form-control form-control-sm">
+                    </div>
+                    <button type="submit" class="btn btn-primary">送信する</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">情報</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tr><th class="ps-3">ID</th><td class="pe-3">#{{ request.id }}</td></tr>
+                    <tr><th class="ps-3">受付日時</th><td class="pe-3">{{ format_date(request.created_at) }}</td></tr>
+                    <tr><th class="ps-3">最終更新</th><td class="pe-3">{{ format_date(request.updated_at) }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

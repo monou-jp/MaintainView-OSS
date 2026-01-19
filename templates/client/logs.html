@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block title %}{{ labels.label_log }} - 全サイト{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ labels.label_log }}</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form action="{{ request.fullpath }}" method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <a href="{{ request.fullpath }}?month={{ prev_month }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-chevron-left"></i> 前月
+                </a>
+            </div>
+            <div class="col-auto">
+                <input type="month" name="month" class="form-control" value="{{ selected_month }}" onchange="this.form.submit()">
+            </div>
+            <div class="col-auto">
+                <a href="{{ request.fullpath }}?month={{ next_month }}" class="btn btn-outline-secondary">
+                    次月 <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-auto ms-auto">
+                <span class="badge bg-primary fs-6">{{ selected_month }} 分を表示中</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if logs %}
+<h4 class="mb-3">{{ labels.label_report }}</h4>
+<div class="row">
+    {% for log in logs %}
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2 border-bottom pb-2">
+                    <h5 class="card-title mb-0">{{ log.summary }}</h5>
+                    <span class="text-muted">{{ format_date(log.performed_at) }}</span>
+                </div>
+                {% if not site %}
+                <p class="small text-primary mb-2">サイト: {{ log.site.name }}</p>
+                {% endif %}
+                <p class="card-text small">{{ log.details | replace('\n', '<br>') | safe if log.details else "" }}</p>
+                <span class="badge bg-light text-dark">カテゴリ: {{ log.category }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-light">指定された期間のログはありません。</div>
+{% endif %}
+{% endblock %}
